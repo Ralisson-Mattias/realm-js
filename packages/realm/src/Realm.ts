@@ -128,6 +128,9 @@ import {
   RenameEvent,
   ReplaceEvent,
   Results,
+  SSLConfiguration,
+  SSLVerifyCallback,
+  SSLVerifyObject,
   SessionState,
   SessionStopPolicy,
   SortDescriptor,
@@ -1271,7 +1274,11 @@ type ResultsType<T = unknown> = Results<T>;
 type SessionStateType = SessionState;
 type SessionStopPolicyType = SessionStopPolicy;
 type SetType<T = unknown> = RealmSet<T>;
+type SSLConfigurationType = SSLConfiguration;
+type SSLVerifyCallbackType = SSLVerifyCallback;
+type SSLVerifyObjectType = SSLVerifyObject;
 type SyncErrorType = SyncError;
+type SyncSessionType = SyncSession;
 type TypesType = typeof Types;
 type UpdateModeType = UpdateMode;
 type UserStateType = UserState;
@@ -1290,7 +1297,6 @@ type SubscriptionOptionsType = SubscriptionOptions;
 type SubscriptionSetType = SubscriptionSet;
 type SubscriptionsStateType = SubscriptionsState;
 type SubscriptionType = Subscription;
-type SyncSessionType = SyncSession;
 
 type ObjectIdType = BSON.ObjectId;
 type Decimal128Type = BSON.Decimal128;
@@ -1491,6 +1497,12 @@ export declare namespace Realm {
     // SSLConfiguration,
     /** @deprecated Please use named imports */
     SortDescriptor,
+    /** @deprecated Please use named imports */
+    SSLConfigurationType as SSLConfiguration,
+    /** @deprecated Please use named imports */
+    SSLVerifyCallbackType as SSLVerifyCallback,
+    /** @deprecated Please use named imports */
+    SSLVerifyObjectType as SSLVerifyObject,
     /** @deprecated Please use named imports */
     SyncConfiguration,
     /** @deprecated Please use named imports */
