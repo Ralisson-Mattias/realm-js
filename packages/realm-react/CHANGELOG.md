@@ -1,25 +1,37 @@
 ## vNext (TBD)
 
 ### Enhancements
+* Allow `useQuery` to be passed a `query` function where `sorted` and `filtered` methods can be called ([#5471](https://github.com/realm/realm-js/issues/4973)) Thanks for the contribution [@levipro](https://github.com/levipro)!
+
+  Example:
+	```tsx
+	const SomeComponent = () => {
+	  const user = useUser();
+		const items = useQuery(Item,
+			(res) => res.filtered(`owner_id == "${user?.id}"`).sorted('createdAt'),
+			 [user]
+		);
+	```
+
 * Create a default context so the `RealmProvider`, `useQuery`, `useRealm`, and `useObject` can be directly imported from `@realm/react` ([#5292](https://github.com/realm/realm-js/issue/5292))
-  Usage example:
-```tsx
-// These imports are now available without calling `createRealmContext`
-import {RealmProvider, useQuery} from '@realm/react'
-//...
-// Provider your schema models directly to the realm provider
-<RealmProvider schema={[Item]}>
-	<SomeComponent/>
-</RealmProvider>
 
-const SomeComponent = () => {
-	const items = useQuery(Item)
-
+  Example:
+	```tsx
+	// These imports are now available without calling `createRealmContext`
+	import {RealmProvider, useQuery} from '@realm/react'
 	//...
-}
-```
->NOTE: If your app is using multiple Realms, then you should continue using `createRealmContext`
-* Allow `useQuery` to be passed a `query` function where `sorted` and `filtered` methods can be called
+	// Provider your schema models directly to the realm provider
+	<RealmProvider schema={[Item]}>
+		<SomeComponent/>
+	</RealmProvider>
+
+	const SomeComponent = () => {
+		const items = useQuery(Item)
+
+		//...
+	}
+	```
+	>NOTE: If your app is using multiple Realms, then you should continue using `createRealmContext`
 
 ### Fixed
 * `useUser` is now typed to never returned `null` [#4973](https://github.com/realm/realm-js/issues/4973)

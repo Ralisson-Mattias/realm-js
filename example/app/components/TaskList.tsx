@@ -19,7 +19,7 @@ export const TaskList: React.FC<TaskListProps> = ({
   return (
     <View style={styles.listContainer}>
       <FlatList
-        data={tasks}
+        data={[...tasks]}
         keyExtractor={task => task._id.toString()}
         renderItem={({item}) => (
           <TaskItem

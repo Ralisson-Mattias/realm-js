@@ -34,26 +34,36 @@ type DependencyList = ReadonlyArray<unknown>;
  */
 export function createUseQuery(useRealm: () => Realm) {
   return function useQuery<T>(
-    type: RealmObjectType<T>, 
-    query: QueryCallback<T> = (collection) => collection, 
+    type: RealmObjectType<T>,
+    query: QueryCallback<T> = (collection) => collection,
     deps: DependencyList = [],
   ): RealmResults<T> {
     const realm = useRealm();
-
-    // We want the user of this hook to be able pass in the `query` function inline (without the need to `useCallback` on it)
-    // This means that the query function is unstable and will be a redefined on each render of the component where `useQuery` is used
-    // Therefore we use the `deps` array to memoize the query function internally, and only use the returned `queryCallback`
-    const queryCallback = useCallback(query, deps);
-
-    const queryResult = useMemo(() => {
-      return queryCallback(realm.objects(type));
-    }, [type, realm, queryCallback]);
 
     // Create a forceRerender function for the cachedCollection to use as its updateCallback, so that
     // the cachedCollection can force the component using this hook to re-render when a change occurs.
     const [, forceRerender] = useReducer((x) => x + 1, 0);
     const collectionRef = useRef<RealmResults<T>>();
     const updatedRef = useRef(true);
+    const queryCallbackRef = useRef<QueryCallback<T> | null>(null);
+
+    // We want the user of this hook to be able pass in the `query` function inline (without the need to `useCallback` on it)
+    // This means that the query function is unstable and will be a redefined on each render of the component where `useQuery` is used
+    // Therefore we use the `deps` array to memoize the query function internally, and only use the returned `queryCallback`
+    const queryCallback = useCallback(query, deps);
+
+    //useEffect(() => {
+    // If the query function changes, we need to update the cachedCollection
+    if (queryCallbackRef.current !== queryCallback) {
+      queryCallbackRef.current = queryCallback;
+      updatedRef.current = true;
+      //forceRerender();
+    }
+    //}, [query, deps]);
+
+    const queryResult = useMemo(() => {
+      return queryCallback(realm.objects(type));
+    }, [type, realm, queryCallback]);
 
     // Wrap the cachedObject in useMemo, so we only replace it with a new instance if `realm` or `queryResult` change
     const { collection, tearDown } = useMemo(() => {
