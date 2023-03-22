@@ -13,8 +13,8 @@
     "test": "wireit",
     "test:main": "wireit",
     "test:renderer": "wireit",
-    "test:ci:main": "mocha-remote --reporter @realm/mocha-reporter --id main node runner.js main",
-    "test:ci:renderer": "mocha-remote --reporter @realm/mocha-reporter --id main node runner.js renderer",
+    "test:ci:main": "mocha-remote --reporter @realm/mocha-reporter node runner.js main",
+    "test:ci:renderer": "mocha-remote --reporter @realm/mocha-reporter node runner.js renderer",
     "lint": "eslint .",
     "package": "electron-builder --dir"
   },
@@ -23,23 +23,25 @@
       "command": "npm run test:main && npm run test:renderer"
     },
     "test:main": {
-      "command": "mocha-remote --reporter @realm/mocha-reporter --id main node runner.js main",
+      "command": "mocha-remote --reporter @realm/mocha-reporter node runner.js main",
       "dependencies": [
-        "../../../packages/realm:bundle",
-        "../../../packages/realm:build:node",
-        "../../../packages/mocha-reporter:build",
-        "../../../packages/realm-network-transport:build",
-        "../../../packages/realm-app-importer:build"
+        "build-dependencies"
       ]
     },
     "test:renderer": {
-      "command": "mocha-remote --reporter @realm/mocha-reporter --id main node runner.js renderer",
+      "command": "mocha-remote --reporter @realm/mocha-reporter node runner.js renderer",
+      "dependencies": [
+        "build-dependencies"
+      ]
+    },
+    "build-dependencies": {
       "dependencies": [
         "../../../packages/realm:bundle",
         "../../../packages/realm:build:node",
         "../../../packages/mocha-reporter:build",
         "../../../packages/realm-network-transport:build",
-        "../../../packages/realm-app-importer:build"
+        "../../../packages/realm-app-importer:build",
+        "../../tests:build"
       ]
     }
   },
