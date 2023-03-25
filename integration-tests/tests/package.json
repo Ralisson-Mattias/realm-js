@@ -29,9 +29,9 @@
       "dependencies": [
         "../../packages/realm:bundle",
         "../../packages/realm:build:node",
-        "../../packages/mocha-reporter:build",
-        "../../packages/realm-network-transport:build",
-        "../../packages/realm-app-importer:build"
+        "../../packages/mocha-reporter:bundle",
+        "../../packages/realm-network-transport:bundle",
+        "../../packages/realm-app-importer:bundle"
       ]
     }
   },
@@ -49,7 +49,7 @@
     "@types/node": "^18.11.9",
     "concurrently": "^6.5.1",
     "mocha": "^10.1.0",
-    "node-fetch": "^3.2.10",
+    "node-fetch": "^2.6.9",
     "platform": "^1.3.6",
     "realm": "*"
   },

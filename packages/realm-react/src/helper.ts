@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2022 Realm Inc.
+// Copyright 2023 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,24 +15,23 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
+import Realm from "realm";
 
-type ResolveType<T> = (value: T | PromiseLike<T>) => void;
-type RejectType = (reason?: any) => void;
-type PromiseHandle<T> = {
-  promise: Promise<T>;
-  resolve: ResolveType<T>;
-  reject: RejectType;
-};
-
-export function createPromiseHandle<T = void>(): PromiseHandle<T> {
-  let resolve: ResolveType<T> | null = null;
-  let reject: RejectType | null = null;
-  const promise = new Promise<T>((arg0, arg1) => {
-    resolve = arg0;
-    reject = arg1;
-  });
-  if (!resolve || !reject) {
-    throw new Error("Expected promise executor to be called synchronously");
-  }
-  return { promise, resolve, reject };
+export function getObjectForPrimaryKey<T extends Realm.Object>(
+  realm: Realm,
+  type: string | { new (...args: any): T },
+  primaryKey: T[keyof T],
+) {
+  return typeof type === "string"
+    ? realm.objectForPrimaryKey(type, primaryKey)
+    : realm.objectForPrimaryKey(type, primaryKey);
 }
+
+export function getObjects<T extends Realm.Object>(
+  realm: Realm,
+  type: string | { new (...args: any): T },
+): Realm.Results<T> {
+  return (typeof type === "string" ? realm.objects(type) : realm.objects(type)) as Realm.Results<T>;
+}
+
+export type CollectionCallback = Parameters<typeof Realm.Results.prototype.addListener>[0];

@@ -12,14 +12,14 @@
     "./dist/bundle.d.ts": "./dist/bundle.dom.d.ts"
   },
   "scripts": {
-    "build": "wireit",
+    "bundle": "wireit",
     "lint": "eslint --ext .js,.ts .",
     "test": "mocha 'src/**/*.test.ts'"
   },
   "wireit": {
-    "build": {
+    "bundle": {
       "command": "rollup --config",
-      "dependencies": ["generate-types", "../realm-common:build"],
+      "dependencies": ["generate-types", "../realm-common:bundle"],
       "files": ["rollup.config.mjs", "src/**/*.ts"],
       "output": ["dist/**"]
     },
@@ -48,7 +48,7 @@
   "dependencies": {
     "@realm/common": "^0.1.4",
     "abort-controller": "^3.0.0",
-    "node-fetch": "^3.1.1"
+    "node-fetch": "^2.6.9"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^23.0.2",

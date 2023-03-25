@@ -6,6 +6,8 @@
   "homepage": "https://realm.io",
   "scripts": {
     "build": "wireit",
+    "bundle": "wireit",
+    "lint": "wireit",
     "lint:cpp": "find src packages/bindgen/src -name '*.cpp' -or -name '*.h' -or -name '*.hpp' | xargs clang-format --dry-run --Werror",
     "lint:cpp:fix": "find src packages/bindgen/src -name '*.cpp' -or -name '*.h' -or -name '*.hpp' | xargs clang-format -i"
   },
@@ -18,13 +20,25 @@
     "build": {
       "dependencies": [
         "submodules",
-        "./packages/realm:build",
-        "./packages/babel-plugin:build",
-        "./packages/mocha-reporter:build",
-        "./packages/realm-react:build",
-        "./packages/realm-tools:build",
-        "./packages/realm-web:build",
-        "./integration-tests/tests:build"
+        "bundle",
+        "./packages/realm:build"
+      ]
+    },
+    "bundle": {
+      "dependencies": [
+        "./packages/realm:bundle",
+        "./packages/babel-plugin:bundle",
+        "./packages/mocha-reporter:bundle",
+        "./packages/realm-app-importer:bundle",
+        "./packages/realm-react:bundle",
+        "./packages/realm-web:bundle",
+        "./packages/realm-tools:build"
+      ]
+    },
+    "lint": {
+      "command": "npm run lint --workspaces --if-present",
+      "dependencies": [
+        "./packages/babel-plugin:bundle"
       ]
     }
   },
@@ -46,17 +60,6 @@
     "email": "help@realm.io",
     "url": "https://realm.io"
   },
-  "files": [
-    "cmake",
-    "lib",
-    "types",
-    "react-native",
-    "scripts",
-    "dependencies.list",
-    "react-native.config.js",
-    "RealmJS.podspec",
-    "CMakeLists.txt"
-  ],
   "workspaces": [
     "example",
     "packages/bindgen",
@@ -107,6 +110,6 @@
     }
   },
   "devDependencies": {
-    "react-native": "0.71.0"
+    "react-native": "0.71.4"
   }
 }
