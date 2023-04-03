@@ -641,6 +641,16 @@ classes:
       # TODO: Consider making preverify_ok a bool.
       make_ssl_verify_callback: '(callback: (server_address: const std::string&, server_port: int, pem_data: std::string_view, preverify_ok: int, depth: int) off_thread -> bool) -> SSLVerifyCallback'
 
+  Logger:
+    cppName: util::Logger
+    sharedPtrWrapped: SharedLogger
+    properties:
+      get_default_logger: SharedLogger
+      get_default_level_threshold: LoggerLevel
+    staticMethods:
+      set_default_logger: '(logger: SharedLogger)'
+      set_default_level_threshold: '(level: LoggerLevel)'
+
   ConstTableRef:
     needsDeref: true
     iterable: Obj
@@ -653,7 +663,7 @@ classes:
       get_column_type: '(column: ColKey) const -> DataType'
       get_link_target: '(column: ColKey) const -> ConstTableRef'
       get_object: '(key: ObjKey) const -> Obj'
-      try_get_object: '(key: ObjKey) const -> Obj'
+      try_get_object: '(key: ObjKey) const -> Nullable<Obj>'
       query: '(query_string: std::string, args: std::vector<QueryArg>, mapping: KeyPathMapping) const -> Query'
       find_primary_key: '(pk: Mixed) -> ObjKey'
 
@@ -687,7 +697,7 @@ classes:
         - '(column: ColKey, value: Mixed)'
         - sig: '(column: ColKey, value: Mixed, is_default: bool)'
           suffix: with_default
-      get_linked_object: '(column: ColKey) const -> Obj'
+      get_linked_object: '(column: ColKey) const -> Nullable<Obj>'
       to_string: () const -> std::string
       get_backlink_count: '() const -> count_t'
       get_backlink_view: '(src_table: TableRef, src_col_key: ColKey) -> TableView'

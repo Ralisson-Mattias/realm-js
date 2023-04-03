@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2022 Realm Inc.
+// Copyright 2023 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-export const flags = {
-  /**
-   * When enabled, objects can be created by providing an array of values (in the order that they were declared in the object schema) in addition to of an object of property values.
-   */
-  ALLOW_VALUES_ARRAYS: false,
-  /**
-   * When enabled, accessing the `Realm` without first importing it from the Realm package, will throw.
-   * Helps finding places where the app is depending on the now deprecated way of using the package.
-   */
-  THROW_ON_GLOBAL_REALM: false,
-};
+declare module "node" {
+  namespace NodeJS {
+    // Workaround for missing types.
+    // @see https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/64921
+    interface ReadableStream {
+      // https://nodejs.org/api/webstreams.html#readablestreamcancelreason
+      cancel(reason?: any): Promise<void>;
+      // https://nodejs.org/api/webstreams.html#readablestreamgetreaderoptions
+      getReader(options?: { mode?: string }): unknown;
+    }
+  }
+}

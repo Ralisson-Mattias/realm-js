@@ -13,11 +13,8 @@
   "scripts": {
     "build": "wireit",
     "start": "CONTEXT=appTemplatesPath=../realm-apps,$CONTEXT npm run mocha -- --watch",
-    "start:missing-server": "CONTEXT=missingServer,$CONTEXT npm start",
-    "start:performance": "CONTEXT=missingServer,performance,integration=false,$CONTEXT npm start",
     "test": "CONTEXT=appTemplatesPath=../realm-apps,$CONTEXT npm run mocha -- --exit",
-    "test:performance": "CONTEXT=missingServer,performance,integration=false,$CONTEXT npm test",
-    "mocha": "mocha --reporter @realm/mocha-reporter src/index.ts",
+    "mocha": "mocha",
     "lint": "eslint --ext .js,.ts ."
   },
   "wireit": {
@@ -46,7 +43,7 @@
     "@types/chai-as-promised": "^7.1.5",
     "@types/jsrsasign": "^10.5.4",
     "@types/mocha": "^10.0.0",
-    "@types/node": "^18.11.9",
+    "@types/node": "^18.15.10",
     "concurrently": "^6.5.1",
     "mocha": "^10.1.0",
     "node-fetch": "^2.6.9",

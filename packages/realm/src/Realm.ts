@@ -85,6 +85,7 @@ import {
   InsertManyResult,
   InsertOneResult,
   InvalidateEvent,
+  IterableWeakRefs,
   List,
   LocalAppConfiguration,
   LogLevel,
@@ -156,6 +157,7 @@ import {
   assert,
   binding,
   extendDebug,
+  flags,
   fromBindingRealmSchema,
   fs,
   index,
@@ -180,9 +182,6 @@ type ObjectSchemaExtra = {
   defaults: Record<string, unknown>;
   // objectTypes: Record<string, unknown>;
 };
-
-// Using a set of weak refs to avoid prevention of garbage collection
-const RETURNED_REALMS = new Set<binding.WeakRef<binding.Realm>>();
 
 export type RealmEventName = "change" | "schema" | "beforenotify";
 
@@ -264,19 +263,20 @@ export class Realm {
 
   public static defaultPath = Realm.normalizePath("default.realm");
 
+  private static internals = new IterableWeakRefs<binding.Realm>();
+
   /**
    * Clears the state by closing and deleting any Realm in the default directory and logout all users.
    * @private Not a part of the public API: It's primarily used from the library's tests.
    */
   public static clearTestState(): void {
     // Close any realms not already closed
-    for (const weakRealm of RETURNED_REALMS) {
-      const realm = weakRealm.deref();
+    for (const realm of this.internals) {
       if (realm && !realm.isClosed) {
         realm.close();
       }
     }
-    RETURNED_REALMS.clear();
+    Realm.internals.clear();
     binding.RealmCoordinator.clearAllCaches();
 
     // Delete all Realm files in the default directory
@@ -632,7 +632,7 @@ export class Realm {
           this.beforeNotifyListeners.callback();
         },
       });
-      RETURNED_REALMS.add(new binding.WeakRef(this.internal));
+      Realm.internals.add(this.internal);
     } else {
       const { internal, schemaExtras } = internalConfig;
       assert.instanceOf(internal, binding.Realm, "internal");
@@ -964,7 +964,7 @@ export class Realm {
     try {
       const objKey = binding.stringToObjKey(objectKey);
       const obj = table.tryGetObject(objKey);
-      const result = wrapObject(obj) as T;
+      const result = obj && (wrapObject(obj) as T);
       return result === null ? undefined : result;
     } catch (err) {
       if (err instanceof binding.InvalidObjKey) {
@@ -1220,6 +1220,7 @@ export class Realm {
   private handleInitialSubscriptions(initialSubscriptions: InitialSubscriptions, realmExists: boolean): void {
     const shouldUpdateSubscriptions = initialSubscriptions.rerunOnOpen || !realmExists;
     if (shouldUpdateSubscriptions) {
+      debug("handling initial subscriptions, %O", { rerunOnOpen: initialSubscriptions.rerunOnOpen, realmExists });
       this.subscriptions.updateNoWait(initialSubscriptions.update);
     }
   }
@@ -1978,13 +1979,19 @@ declare global {
 let warnedAboutGlobalRealmUse = false;
 Object.defineProperty(safeGlobalThis, "Realm", {
   get() {
-    if (!warnedAboutGlobalRealmUse) {
+    if (flags.THROW_ON_GLOBAL_REALM) {
+      throw new Error(
+        "Accessed global Realm, please update your code to ensure you import Realm via a named import:\nimport { Realm } from 'realm';",
+      );
+    } else if (!warnedAboutGlobalRealmUse) {
       // eslint-disable-next-line no-console
       console.warn(
-        "Your app is relying on a Realm global, which will be removed in realm-js v13,\n",
-        "please update your code to ensure you import Realm via a named import:\n\n",
+        "Your app is relying on a Realm global, which will be removed in realm-js v13, please update your code to ensure you import Realm via a named import:\n\n",
         'import { Realm } from "realm"; // For ES Modules\n',
-        'const { Realm } = require("realm"); // For CommonJS\n',
+        'const { Realm } = require("realm"); // For CommonJS\n\n',
+        "To determine where, put this in the top of your index file:\n",
+        `import { flags } from "realm";\n`,
+        `flags.THROW_ON_GLOBAL_REALM = true`,
       );
       warnedAboutGlobalRealmUse = true;
     }
